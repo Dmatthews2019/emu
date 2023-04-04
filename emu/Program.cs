@@ -10,17 +10,18 @@ namespace emu
         public static void Main()
         {
             IKeyBoardEventManager keyboardEventManager = new KeyBoardEventManager();
-            keyboardEventManager.OnKey(
-                    (e) =>
+            for (int i = 0; i < 10000; i++)
+            {
+                keyboardEventManager.OnKey((e) =>
                     {
-                        Console.WriteLine(e.ToString());
+                        Console.WriteLine(e);
                     }
                 );
+            }
 
             while (true)
             {
                 Thread.Sleep(100);
-                
             }
         }
 
