@@ -1,31 +1,32 @@
-﻿using emu.InputManager.KeyboardClient;
-using emu.InputManager.KeyboardClient.EventListeners;
-using emu.InputManager.KeyCodes;
+﻿using emu.InputManager.ClientManager;
+using emu.InputManager.ClientManager.Interfaces;
+using emu.InputManager.KeyCodes.Keyboard;
+using System.Diagnostics;
 
 namespace emu
 {
     class Program
     {
-
+        
         public static void Main()
         {
-            IKeyBoardEventManager keyboardEventManager = new KeyBoardEventManager();
-            for (int i = 0; i < 10000; i++)
+            IClientProvider eventManager = new ClientProvider();
+            eventManager.Mouse.OnMouseUp((e) => 
             {
-                keyboardEventManager.OnKey((e) =>
+                if (e.Code == 2 && e.Window.Title.ToLower().Contains("note"))
+                {
+                    Process process = Process.GetProcessById((int)e.Window.ProcessId);
+                    if (process != null )
                     {
-                        Console.WriteLine(e);
+                        process.Kill(); // End the process
                     }
-                );
-            }
+                }
+            });
 
-            while (true)
-            {
-                Thread.Sleep(100);
+            while (true) {
+                Thread.Sleep(1000);
             }
         }
-
-
     }
 
 }

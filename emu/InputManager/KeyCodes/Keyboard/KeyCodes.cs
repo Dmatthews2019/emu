@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace emu.InputManager.KeyCodes
+namespace emu.InputManager.KeyCodes.Keyboard
 {
     public static class KeyCodes
     {

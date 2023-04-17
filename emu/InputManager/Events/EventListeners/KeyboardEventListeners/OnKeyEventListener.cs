@@ -1,11 +1,16 @@
-﻿using emu.InputManager.EventTypes;
-using emu.InputManager.KeyboardClient.EventListeners.Base;
-using emu.InputManager.KeyEvents;
+﻿using emu.InputManager.Events.EventListeners.interfaces;
+using emu.InputManager.Events.EventListeners.KeyboardEventListeners.Base;
+using emu.InputManager.Events.EventTypes;
+using emu.InputManager.Events.KeyBoardEvents;
+using emu.InputManager.Strategies.Interfaces;
 
-namespace emu.InputManager.KeyboardClient.EventListeners
+namespace emu.InputManager.Events.EventListeners.KeyboardEventListeners
 {
-    public class OnKeyEventListener : ListenerBase, IEventListener
+    public class OnKeyEventListener : KeyBoardListenerBase, IEventListener<KeyEvent>
     {
+        public OnKeyEventListener(IErrorHandlingStrategy errorStrategy) : base(errorStrategy)
+        {
+        }
         public void RegisterEvent(Action<KeyEvent> a, int delay)
         {
             Task.Run(() =>
@@ -21,7 +26,7 @@ namespace emu.InputManager.KeyboardClient.EventListeners
                             if (GetAsyncKeyState(i) != 0)
                             {
                                 currentKey = i;
-                                RaiseEvent(a, delay, ref currentKey, EventType.OnKey);
+                                RaiseEvent(a, delay, currentKey, EventType.OnKey);
                             }
                         }
                         signal.Wait(100);
