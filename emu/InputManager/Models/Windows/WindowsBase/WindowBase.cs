@@ -8,35 +8,51 @@ using System.Threading.Tasks;
 
 namespace emu.InputManager.Models.Windows.WindowsBase
 {
+    using HardwareInfo;
+    using Shapes;
+
     public abstract class WindowBase
     {
-        [DllImport("user32.dll")]
-        public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
-
-        [DllImport("user32.dll")]
-        public static extern IntPtr GetForegroundWindow();
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool GetWindowRect(IntPtr hWnd, out Rectangle lpRect);
+        public static Rectangle GetWindowRectangle(IntPtr hWnd)
+        {
+            if (ExternalWindowClient.GetWindowRect(hWnd, out Rect rect))
+            {
+                IntPtr hMonitor = ExternalWindowClient.MonitorFromWindow(hWnd, 2 /* MONITOR_DEFAULTTONEAREST */);
+                MONITORINFO monitorInfo = new MONITORINFO();
+                monitorInfo.cbSize = Marshal.SizeOf(monitorInfo);
+                if (ExternalWindowClient.GetMonitorInfo(hMonitor, ref monitorInfo))
+                {
+                    int offsetX = monitorInfo.rcMonitor.left;
+                    int offsetY = monitorInfo.rcMonitor.top;
+                    return new Rectangle(rect.left - offsetX, rect.top - offsetY, rect.right - rect.left, rect.bottom - rect.top);
+                }
+            }
+            throw new Exception("Failed to get window rectangle");
+        }
+        
+        public static Rectangle GetWindowRectangleAll(IntPtr hWnd)
+        {
+            if (ExternalWindowClient.GetWindowRect(hWnd, out Rect rect))
+            {
+                return new Rectangle(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+            }
+            throw new Exception("Failed to get window rectangle");
+        }
 
         public static Point ComputeLocalMousePosition(Point globalMousePoint)
         {
             Point localPoint = new Point();
             localPoint.X = globalMousePoint.X - GetWindowRect().X;
-            localPoint.Y = globalMousePoint.X - GetWindowRect().Y;
+            localPoint.Y = globalMousePoint.Y - GetWindowRect().Y;
             return localPoint;
         }
 
         public static string GetWindowTitle()
         {
-            IntPtr windowHandle = GetForegroundWindow();
+            IntPtr windowHandle = ExternalWindowClient.GetForegroundWindow();
             const int nChars = 256;
             StringBuilder buffer = new StringBuilder(nChars);
-            if (GetWindowText(windowHandle, buffer, nChars) > 0)
+            if (ExternalWindowClient.GetWindowText(windowHandle, buffer, nChars) > 0)
             {
                 return buffer.ToString();
             }
@@ -46,20 +62,28 @@ namespace emu.InputManager.Models.Windows.WindowsBase
 
         public static Rectangle GetWindowRect()
         {
-            IntPtr windowHandle = GetForegroundWindow();
-            GetWindowRect(windowHandle, out Rectangle rectangle);
-            rectangle.X = rectangle.Left;
-            rectangle.Y = rectangle.Top;
-            rectangle.Width = rectangle.Width;
-            rectangle.Height = rectangle.Height;
+            IntPtr windowHandle = ExternalWindowClient.GetForegroundWindow();
+            var rectangle = GetWindowRectangle(windowHandle);
+            return rectangle;
+        }
+        public static Rectangle GetWindowRectAll()
+        {
+            IntPtr windowHandle = ExternalWindowClient.GetForegroundWindow();
+            var rectangle = GetWindowRectangleAll(windowHandle);
             return rectangle;
         }
 
         public static uint GetProcessId() 
         {
-            IntPtr windowHandle = GetForegroundWindow();
-            GetWindowThreadProcessId(windowHandle, out uint processId);
+            IntPtr windowHandle = ExternalWindowClient.GetForegroundWindow();
+            ExternalWindowClient.GetWindowThreadProcessId(windowHandle, out uint processId);
             return processId;
+        }
+        
+        public static Point GetCursorPoint()
+        {
+            ExternalWindowClient.GetCursorPos(out Point lpPoint);
+            return lpPoint;
         }
     }
 }

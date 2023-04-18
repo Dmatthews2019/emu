@@ -3,8 +3,13 @@ using Newtonsoft.Json;
 
 namespace emu.InputManager.Events.Base
 {
-    public class EventBase
+    using System.Drawing;
+    using System.Runtime.InteropServices;
+
+    public abstract class EventBase
     {
+        [DllImport("user32.dll")]
+        private static extern bool GetCursorPos(out Point lpPoint);
         public EventBase(int keyCode, EventType eventType, int delay)
         {
             Code = keyCode;
@@ -23,6 +28,12 @@ namespace emu.InputManager.Events.Base
         public Guid EventId { get; init; }
         public int ThreadId { get; } = Thread.CurrentThread.ManagedThreadId;
         public EventType EventType { get; init; }
+
+        public static Point GetCursorPoint()
+        {
+            GetCursorPos(out Point lpPoint);
+            return lpPoint;
+        }
 
         public override string ToString()
         {

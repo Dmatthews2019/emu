@@ -18,10 +18,6 @@ namespace emu.InputManager.Events.EventListeners.MouseEventListeners.Base
         [DllImport("user32.dll")]
         public static extern bool GetAsyncKeyState(int vKey);
 
-        [DllImport("user32.dll")]
-        private static extern bool GetCursorPos(out Point lpPoint);
-
-
         private IErrorHandlingStrategy _errorStrategy;
         public MouseListenerBase(IErrorHandlingStrategy errorStrategy)
         {
@@ -36,9 +32,7 @@ namespace emu.InputManager.Events.EventListeners.MouseEventListeners.Base
         }
         protected static void RaiseEvent(Action<MouseEvent> a, int delay, int keyCode, EventType eventType)
         {
-            GetCursorPos(out Point mousePosition);
-
-            MouseEvent e = new(keyCode, eventType, delay, mousePosition);
+            MouseEvent e = new(keyCode, eventType, delay);
             Thread.Sleep(delay);
             a.Invoke(e);
         }
