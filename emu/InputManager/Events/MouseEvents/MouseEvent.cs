@@ -13,15 +13,7 @@ namespace emu.InputManager.Events.MouseEvents
         public MouseEvent(int keyCode, EventType eventType, int delay) : base(keyCode, eventType, delay)
         { }
 
-        private Point _mousePosition;
-
-        public MouseEvent(int keyCode, EventType eventType, int delay, Point mousePosition) : this(keyCode, eventType, delay)
-        {
-            MousePosition = mousePosition;
-            _mousePosition = mousePosition;
-        }
-
-        public Window Window { get { return new Window(_mousePosition); } }
-        public Point MousePosition { get; }
+        public Window Window => new Window();
+        public Point MousePosition => GetCursorPoint();
     }
 }

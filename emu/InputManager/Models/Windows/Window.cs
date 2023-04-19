@@ -13,20 +13,21 @@ namespace emu.InputManager.Models.Windows
     public class Window : WindowBase
     {
 
+        
         private Point _globalMousePoint;
 
-        public Window(Point globalMousePoint)
+        public Window()
         {
-            _globalMousePoint = globalMousePoint;
+            _globalMousePoint = GetCursorPoint();
         }
 
         public string Title => GetWindowTitle();
-        public Rectangle Rectangle => GetWindowRect();
+        public Rectangle RelativeMonitorRectangle => GetWindowRect();
+        public Rectangle Rectangle => GetWindowRectAll();
         public Point LocalMousePosition => ComputeLocalMousePosition(_globalMousePoint);
-        public Size Size => this.Rectangle.Size;
+        public Size Size => new Size(this.Rectangle.Width, this.Rectangle.Height);
         public Point Location => this.Rectangle.Location;
         public uint ProcessId => GetProcessId();
-
 
         public override string ToString()
         {
