@@ -1,41 +1,34 @@
-﻿using emu.InputManager.ClientManager;
-using emu.InputManager.ClientManager.Interfaces;
-using emu.InputManager.KeyCodes.Keyboard;
-using MouseCodes = emu.InputManager.KeyCodes.Mouse.KeyCodes;
-using System.Diagnostics;
+﻿using EventManagement.InputManager.ClientManager;
+using EventManagement.InputManager.ClientManager.Interfaces;
+using EventManagement.InputManager.Clients.MouseClient;
+using EventManagement.InputManager.KeyCodes.Keyboard;
 
 namespace emu
 {
-    using InputManager.Strategies.Interfaces;
-
     class Program
     {
         public static void Main()
         {
             IClientProvider eventManager = new ClientProvider();
-            eventManager.Mouse.OnMouseUp((e) =>
+            eventManager.Mouse.OnMouseUp(e =>
             {
                 Console.WriteLine(e);
             });
-            
-            
-            eventManager.KeyBoard.OnKeyUp((e) =>
+
+            eventManager.KeyBoard.OnKeyUp(e =>
             {
                 if (e.Code == KeyCodes.A)
                 {
-                    Console.WriteLine("Pressed A");                    
-                    Console.WriteLine(e);                    
+                    Console.WriteLine("Pressed A");
+                    Console.WriteLine(e);
                 }
-                
             });
-            
-            
 
             while (true) {
-                Thread.Sleep(1000);
+                Thread.Sleep(100);
+                Console.WriteLine(MouseClient.Window.LocalMousePosition);
             }
         }
     }
-
 }
 
